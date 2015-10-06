@@ -4,13 +4,28 @@ import requests,json,random
 from sys import argv
 import os
 
+"""
+checking if config file is available, else creating one.
+"""
 if os.path.isfile('silt.conf'):
     discogsFile = open('silt.conf','r+')
 elif not os.path.isfile('silt.conf'):
     discogsFile = open('silt.conf','w+')
 discogsList = discogsFile.readlines()
 
+"""
+todo: learn how to put lines of a config into a dict and read from that dict
+trying to make a config file reader.
+"""
+# def configRead(discogsFile):
+#     discogsList = discogsFile.readlines()
+#     if 'user=' in discogsList:
+#         userIndex = discogsList.index('user=')
+#         if len(discogsList[
 
+"""
+checking for arguments
+"""
 if len(argv) > 1:
     if '-u' in argv:
         argUser = argv[argv.index('-u') + 1]
@@ -24,17 +39,34 @@ else:
         toWrite = 'user='+user
         discogsFile.write(toWrite);
 
-discogsFile.close()
-
+"""
+pulling from discogs whether or not the user exists
+"""
 random.seed()
 user_agent = {'User-agent':'silt/0.0'}
 discogsURL = 'https://api.discogs.com/users/{}/collection/folders/0/releases'.format(user)
 r = requests.get(discogsURL, headers = user_agent)
 discogsDictAll = r.json()
 
+"""
+checking if received proper discogs output
+"""
 if 'message' in discogsDictAll:
     print('\nUser not found.')
+
+"""
+the user must be valid, parsing through data and populating a list of their collection
+"""
 else:
+    """
+    if we were successfully able to pull all of this information, open a new config and write that username to file 
+    """
+    discogsFile.close()
+    discogsFile = open('silt.conf','w+')
+    toWrite = 'user='+user
+    discogsFile.write(toWrite);
+    discogsFile.close()
+
     library = {}
     for i in discogsDictAll['releases']:
         for e in i:
@@ -50,7 +82,3 @@ else:
         listenTo = libraryKeys[random.randrange(len(library))]
         print('\nHow about...\n'+listenTo,'by',library[listenTo])
         no = input('\n\nAnother?')
-    discogsFile.close()
-    discogsFile = open('silt.conf','w+')
-    toWrite = 'user='+user
-    discogsFile.write(toWrite);
