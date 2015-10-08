@@ -4,40 +4,17 @@ import requests,json,random
 from sys import argv
 import os
 
-"""
-checking if config file is available, else creating one.
-"""
-if os.path.isfile('silt.conf'):
-    discogsFile = open('silt.conf','r+')
-elif not os.path.isfile('silt.conf'):
-    discogsFile = open('silt.conf','w+')
-discogsList = discogsFile.readlines()
-
-"""
-todo: learn how to put lines of a config into a dict and read from that dict
-trying to make a config file reader.
-"""
-# def configRead(discogsFile):
-#     discogsList = discogsFile.readlines()
-#     if 'user=' in discogsList:
-#         userIndex = discogsList.index('user=')
-#         if len(discogsList[
 
 """
 checking for arguments
 """
 if len(argv) > 1:
-    if '-u' in argv:
-        argUser = argv[argv.index('-u') + 1]
-        user = argUser
-else: 
-    if len(discogsList) > 0:
-        user = discogsList[0][5:]
-        print('Retrieving Discogs information for:',user,'\n\n')
-    elif len(discogsList) == 0:
+    if '-u' in argv and argv.index('-u') + 1 < len(argv):
+        user = argv[argv.index('-u') + 1]
+    elif not argv.index('-u') + 1 < len(argv):
         user = input('Enter discogs username:')
-        toWrite = 'user='+user
-        discogsFile.write(toWrite);
+else: 
+    user = input('Enter discogs username:')
 
 """
 pulling from discogs whether or not the user exists
@@ -49,30 +26,17 @@ r = requests.get(discogsURL, headers = user_agent)
 discogsDictAll = r.json()
 
 """
-checking if received proper discogs output
+the user must be valid, parsing through data and populating a list of their collection
+if we were successfully able to pull all of this information, open a new config and write that username to file 
 """
 if 'message' in discogsDictAll:
     print('\nUser not found.')
-
-"""
-the user must be valid, parsing through data and populating a list of their collection
-"""
 else:
-    """
-    if we were successfully able to pull all of this information, open a new config and write that username to file 
-    """
-    discogsFile.close()
-    discogsFile = open('silt.conf','w+')
-    toWrite = 'user='+user
-    discogsFile.write(toWrite);
-    discogsFile.close()
-
     library = {}
-    for i in discogsDictAll['releases']:
-        for e in i:
-            # print(i[e])
-            if type(i[e])== dict:
-                library[i[e]['title']] = i[e]['artists'][0]['name']
+    for release in discogsDictAll['releases']:
+        for info in release:
+            if type(release[info])== dict:
+                library[release[info]['title']] = release[info]['artists'][0]['name']
 
     libraryKeys = list(library)
     listenTo = libraryKeys[random.randrange(len(library))]
