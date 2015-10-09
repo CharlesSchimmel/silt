@@ -7,3 +7,4 @@ Soon:
 
     Sorting by vinyl, tape, cd; 
     Private collections
+    Config
