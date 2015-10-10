@@ -34,6 +34,21 @@ def getRandom(library,libraryKeys):
     listenTo = libraryKeys[random.randrange(len(library))]
     return listenTo
 
+def popLibrary(user):
+    if discogsPull(user) != False:
+        library, libraryKeys = discogsPull(user)
+        listenTo = getRandom(library,libraryKeys)
+        print('\nYou should listen to:\n'+listenTo,'by',library[listenTo])
+        no = input('\n\nAnother?')
+        while no.lower() != 'n' and no.lower() != 'no':
+            listenTo = libraryKeys[random.randrange(len(library))]
+            print('\nHow about...\n'+listenTo,'by',library[listenTo])
+            no = input('\n\nAnother?')
+    else:
+        print('Invalid User.')
+        user = input('Enter discogs username:')
+        popLibrary(user)
+
 """
 checking for arguments
 """
@@ -45,12 +60,4 @@ if len(argv) > 1:
 else: 
     user = input('Enter discogs username:')
 
-
-library, libraryKeys = discogsPull(user)
-listenTo = getRandom(library,libraryKeys)
-print('\nYou should listen to:\n'+listenTo,'by',library[listenTo])
-no = input('\n\nAnother?')
-while no.lower() != 'n' and no.lower() != 'no':
-    listenTo = libraryKeys[random.randrange(len(library))]
-    print('\nHow about...\n'+listenTo,'by',library[listenTo])
-    no = input('\n\nAnother?')
+popLibrary(user)
