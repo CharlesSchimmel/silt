@@ -12,4 +12,3 @@ Soon:
 
     Sorting by vinyl, tape, cd; 
     Private collections
-    Configdd

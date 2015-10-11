@@ -20,7 +20,7 @@ else
         fi
         echo "Checking/Installing Requests via pip3"
         pip3 install requests
-        cp -p silt.py /usr/bin/silt
+        cp -p silt.py /usr/local/bin/silt
         if ! [ -e $CONFIG ]; then
             echo "Copying config..."
             cp -p silt.ini $CONFIG
