@@ -84,7 +84,7 @@ def configParse():
         libraryFile = path.expanduser(libraryFile)
         library = libraryFromFile(libraryFile)
     elif 'libraryFile' not in config['default']:
-        libraryFile = 'libraryFile.json'
+        libraryFile = '{}/.silt/libraryFile.json'.format(home)
 
     return user,recAmt,library,libraryFile
 
@@ -111,8 +111,9 @@ def libraryDump(library,libraryFile):
 
 def main():
     user,recAmt,library,libraryFile = configParse()
-    if user == None:
-        user = input('Enter discogs username:')
+    if library == None:
+        if user == None:
+            user = input('Enter discogs username:')
     if recAmt == None:
         recAmt = 1
 
@@ -126,6 +127,7 @@ def main():
         if '-u' in argv:
             if argv.index('-u') + 1 < len(argv):
                 user = argv[argv.index('-u') + 1]
+                library = popLibrary(user)
             elif not argv.index('-u') + 1 < len(argv): # no username given
                 print('Incorrect formatting for "-u" argument. We need a number after it.')
                 user = input('Enter discogs username:')
