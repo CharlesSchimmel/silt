@@ -8,41 +8,38 @@ if [ "$(id -u)" != "0" ]; then
     echo "You must be root to install this script." 1>&2
     exit 1
 else
-    echo "This will install 'silt' and its dependency 'requests' via pip3.'"
+    echo "This will install 'silt'"
     echo "[ENTER] to confirm"
     read confirm
-    echo "Checking/Installing Pip3"
-        if ! pip3 >/dev/null 2>&1; then
-            echo "pip3 not found, attempting to install:"
-            if apt >/dev/null 2>&1; then
-                apt-get install python3.4 python3-pip
-            else
-                echo "apt currently the only supported package manager. Please install pip3 and requests seperately."
-            fi
-        fi
-        echo "Checking/Installing Requests via pip3"
-        pip3 install requests
+    # I'm just going to package Requests with it instead. Using pip3 to install something is rude
 
-        #check if app location exists; only make it if it exists
-        if ! [ -e $APP ]; then
-            mkdir -m 777 $APP
-        fi
+    #check if app location exists; only make it if it exists
+    if ! [ -e $APP ]; then
+        mkdir -m 777 $APP
+    fi
 
-        #cp will overwrite
-        cp -p silt.py $APP/silt.py
+    echo "Getting/Unpacking requests..."
+    wget -O /tmp/requests.tar.gz https://pypi.python.org/packages/source/r/requests/requests-2.8.1.tar.gz
+    tar xvfz /tmp/requests.tar.gz -C $APP >/dev/null 2>&1
+    cp /tmp/requests-2.8.1/requests $APP
+    echo "Done."
 
-        #if there's already something in the bin location, delete it
-        if [ -e $BINLOC ]; then
-            rm $BINLOC
-        fi
-        #make a softlink from the app location to the bin location
-        ln -s $APP/silt.py /usr/local/bin/silt
+    #cp will overwrite
+    cp -p silt.py $APP/silt.py
 
-        if ! [ -e $CONFIG ]; then
-            echo "Copying config..."
-            cp -p silt.ini $CONFIG
-        fi
+    #if there's already something in the bin location, delete it
+    if [ -e $BINLOC ]; then
+        rm $BINLOC
+    fi
 
-        echo "Done. Enter 'silt' to run."
-        echo "Config located at $HOME/.silt/silt.ini"
+    #make a softlink from the app location to the bin location
+    ln -s $APP/silt.py $BINLOC
+
+    if ! [ -e $CONFIG ]; then
+        echo "Copying config..."
+        cp -p silt.ini $CONFIG
+    fi
+
+    echo "Done. Enter 'silt' to run."
+    echo "Config located at $HOME/.silt/silt.ini"
 fi

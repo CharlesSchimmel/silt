@@ -6,6 +6,8 @@ from os import getenv
 from os import path
 import configparser
 
+class Silt:
+
 
 def help():
     """
@@ -94,7 +96,7 @@ def libraryFromFile(libraryFile):
             library = json.load(database)
             return library
 
-    except(OSError,IOError):
+    except ( FileNotFoundError ):
         return None
 
 

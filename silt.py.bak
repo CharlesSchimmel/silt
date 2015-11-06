@@ -94,7 +94,7 @@ def libraryFromFile(libraryFile):
             library = json.load(database)
             return library
 
-    except(OSError,IOError):
+    except ( FileNotFoundError ):
         return None
 
 
