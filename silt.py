@@ -5,6 +5,50 @@ from sys import argv
 from os import getenv
 from os import path
 import configparser
+import discogs_client
+from gi.repository import Gtk
+
+class mainWin(Gtk.Window):
+    def __init__(self,user,library):
+        self.library = library
+        Gtk.Window.__init__(self,title="Silt")
+
+        self.grid = Gtk.Grid()
+        self.add(self.grid)
+        self.set_border_width(5)
+
+        labelText = "{} you should listen to:".format(user)
+        self.label1 = Gtk.Label()
+        self.label1.set_markup("{} you should listen to:".format(user))
+        self.grid.attach(self.label1,0,0,1,1)
+        self.label1.set_hexpand(True)
+
+        self.recLabel = Gtk.Label()
+        tmpText = "<b>{}</b>".format(ranSuggest(self.library))
+        self.recLabel.set_markup(tmpText)
+        self.grid.attach(self.recLabel,0,1,1,1)
+        self.recLabel.set_hexpand(True)
+
+        self.anotherButton = Gtk.Button(label="Another")
+        self.anotherButton.connect("clicked",self.newRec)
+        self.grid.attach(self.anotherButton,0,3,1,1)
+        self.anotherButton.set_hexpand(True)
+
+        self.closeButton = Gtk.Button(label="Exit")
+        self.grid.attach(self.closeButton,0,4,1,1)
+        self.closeButton.connect("clicked",self.close)
+        self.closeButton.set_hexpand(True)
+
+        firstSug = ranSuggest(library)
+
+
+    def close(self,widget):
+        Gtk.main_quit()
+
+    def newRec(self,widget):
+        tmpText = "<b>{}</b>".format(ranSuggest(self.library))
+        self.recLabel.set_markup(tmpText)
+
 
 
 def help():
@@ -23,7 +67,7 @@ def discogsPull(user):
     """
     pulling from discogs whether or not the user exists
     """
-    user_agent = {'User-agent':'silt/0.1'}
+    user_agent = {'User-agent':'silt/0.1 +https://github.com/charlesschimmel/silt'}
     discogsURL = 'https://api.discogs.com/users/{}/collection/folders/0/releases'.format(user)
     r = requests.get(discogsURL, headers = user_agent)
     discogsDictAll = r.json()
@@ -53,6 +97,12 @@ def genSuggest(recAmt,library,libraryKeys):
             ct += 1
     return listenList
 
+def ranSuggest(library):
+    random.seed()
+    tempRec = list(library.keys())[random.randrange(len(library))]
+    tempStr = tempRec+' by '+library[tempRec]
+    return tempStr
+        
 
 def popLibrary(user):
     """
@@ -108,7 +158,6 @@ def libraryDump(library,libraryFile):
         with open(libraryFile,'w+') as database:
             json.dump(library,database)
 
-
 def main():
     user,recAmt,library,libraryFile = configParse()
     if library == None:
@@ -124,17 +173,6 @@ def main():
     """
     validArgs = ['-u','-r','-h','-update']
     if len(argv) > 1:
-        """
-        considering just removing this. It doesn't work properly and isn't very useful.
-        if '-u' in argv:
-            if argv.index('-u') + 1 < len(argv):
-                user = argv[argv.index('-u') + 1]
-                library = popLibrary(user)
-            elif not argv.index('-u') + 1 < len(argv): # no username given
-                print('Incorrect formatting for "-u" argument. We need a number after it.')
-                user = input('Enter discogs username:')
-        """
-
         if '-r' in argv:
             if argv.index('-r') + 1 < len(argv):
                 try:
@@ -158,24 +196,38 @@ def main():
             library = popLibrary(user)
             libraryDump(library,libraryFile)
 
-        if '-u' not in argv and '-r' not in argv and '-update' not in argv: # some argument was given but not valid
+        if '-u' not in argv and '-r' not in argv and '-update' not in argv and '-gtk' not in argv: # some argument was given but not valid
             help()
+
 
     if library == None:
         library = popLibrary(user)
         libraryDump(library,libraryFile)
         listenList = genSuggest(recAmt,library,list(library))
-        print('\nYou should listen to:\n')
-        for rec in listenList:
-            print(rec)
+        if '-gtk' in argv:
+            mainGtk(user,library)
+        else:
+            mainCli(listenList)
 
     else:
         listenList = genSuggest(recAmt,library,list(library))
-        print('\nYou should listen to:\n')
-        for rec in listenList:
-            print(rec)
+        if '-gtk' in argv:
+            mainGtk(user,library)
+        else:
+            mainCli(listenList)
 
+def mainGtk(user,library):
+    win = mainWin(user,library)
+    win.connect("delete-event", Gtk.main_quit)
+    win.show_all()
+    Gtk.main()
+
+def mainCli(listenList):
+    print('\nYou should listen to:\n')
+    for rec in listenList:
+        print(rec)
 try:
     main()
+
 except KeyboardInterrupt:
     pass

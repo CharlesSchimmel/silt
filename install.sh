@@ -24,6 +24,12 @@ else
     cp /tmp/requests-2.8.1/requests $APP
     echo "Done."
 
+    echo "Getting/Unpacking pgi..."
+    wget -o /tmp/pgi.tar.gz https://pypi.python.org/packages/source/p/pgi/pgi-0.0.10.1.tar.gz
+    tar xvfz /tmp/pgi.tar.gz -C $APP >/dev/null 2>&1
+    cp /tmp/pgi-0.0.10.1/pgi $APP
+    echo "Done."
+
     #cp will overwrite
     cp -p silt.py $APP/silt.py
 
@@ -41,5 +47,5 @@ else
     fi
 
     echo "Done. Enter 'silt' to run."
-    echo "Config located at $HOME/.silt/silt.ini"
+    echo "Please enter your username in the config located at $HOME/.silt/silt.ini"
 fi
