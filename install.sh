@@ -4,16 +4,16 @@ APP=$HOME/.silt/
 CONFIG=$APP/silt.ini
 BINLOC=/usr/local/bin/silt
 
-if [ "$(id -u)" != "0" ]; then
+if [[ "$(id -u)" != "0" ]]; then
     echo "You must be root to install this script." 1>&2
     exit 1
 else
     echo "This will install 'silt'"
-    echo "[ENTER] to confirm"
+    echo "[[ENTER]] to confirm"
     read confirm
 
     #check if app location exists; only make it if it exists
-    if ! [ -e $APP ]; then
+    if ! [[ -e $APP ]]; then
         mkdir -m 777 $APP
     fi
 
@@ -22,7 +22,7 @@ else
     echo "enter 'n'"
     read confirm
 
-    if [ $confirm != "n" ]; then
+    if [[ $confirm != "n" ]]; then
         echo "Getting/Unpacking requests..."
         wget -O /tmp/requests.tar.gz https://pypi.python.org/packages/source/r/requests/requests-2.8.1.tar.gz 
         tar xvfz /tmp/requests.tar.gz
@@ -30,8 +30,7 @@ else
         echo "Done."
 
         echo "Getting/Unpacking pgi..."
-        cd /tmp/
-        wget https://pypi.python.org/packages/source/p/pgi/pgi-0.0.10.1.tar.gz 
+        wget -O /tmp/pgi.tar.gz https://pypi.python.org/packages/source/p/pgi/pgi-0.0.10.1.tar.gz 
         tar xvfz /tmp/pgi-0.0.10.1.tar.gz
         cp -r /tmp/pgi-0.0.10.1/pgi $APP
         echo "Done."
@@ -44,14 +43,14 @@ else
     cp -p silt.py $APP/silt.py
 
     #if there's already something in the bin location, delete it
-    if [ -e $BINLOC ]; then
+    if [[ -e $BINLOC ]]; then
         rm $BINLOC
     fi
 
     #make a softlink from the app location to the bin location
     ln -s $APP/silt.py $BINLOC
 
-    if ! [ -e $CONFIG ]; then
+    if ! [[ -e $CONFIG ]]; then
         echo "Copying config..."
         cp -p silt.ini $CONFIG
     fi

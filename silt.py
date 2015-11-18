@@ -5,7 +5,6 @@ from sys import argv
 from os import getenv
 from os import path
 import configparser
-import discogs_client
 from gi.repository import Gtk
 
 class mainWin(Gtk.Window):
@@ -69,12 +68,15 @@ class mainWin(Gtk.Window):
         r = requests.get(releaseURL,headers=headers)
         if r.status_code == 200:
             r = r.json()
-            for sub in r['images']:
-                if sub['type'] == 'primary':
-                    r = requests.get(sub['resource_url'],headers=headers, stream=True)
-                    with open('/tmp/image.jpg','wb') as f:
-                        r.raw.decode_content = True
-                        shutil.copyfileobj(r.raw,f)
+            if 'images' in sub:
+                for sub in r['images']:
+                    if sub['type'] == 'primary':
+                        r = requests.get(sub['resource_url'],headers=headers, stream=True)
+                        with open('/tmp/image.jpg','wb') as f:
+                            r.raw.decode_content = True
+                            shutil.copyfileobj(r.raw,f)
+            else:
+                print('No image available for this release.')
         else:
             pass
 
