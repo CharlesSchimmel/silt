@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import requests,json,random
+import requests,json,random,shutil
 from sys import argv
 from os import getenv
 from os import path
@@ -11,15 +11,16 @@ from gi.repository import Gtk
 class mainWin(Gtk.Window):
     def __init__(self,user,library):
         self.library = library
+        self.curRec = ranSuggest(self.library)
         Gtk.Window.__init__(self,title="Silt")
 
         self.grid = Gtk.Grid()
         self.add(self.grid)
         self.set_border_width(5)
 
-        labelText = "{} you should listen to:".format(user)
+        labelText = "How about:"
         self.label1 = Gtk.Label()
-        self.label1.set_markup("{} you should listen to:".format(user))
+        self.label1.set_markup("How about:")
         self.grid.attach(self.label1,0,0,1,1)
         self.label1.set_hexpand(True)
 
@@ -29,25 +30,61 @@ class mainWin(Gtk.Window):
         self.grid.attach(self.recLabel,0,1,1,1)
         self.recLabel.set_hexpand(True)
 
+        self.cover = Gtk.Frame()
+        self.grid.attach(self.cover,0,2,1,1)
+        self.img = Gtk.Image.new_from_file('')
+        self.cover.add(self.img)
+
         self.anotherButton = Gtk.Button(label="Another")
         self.anotherButton.connect("clicked",self.newRec)
+        self.anotherButton.connect("clicked",self.updateImage)
         self.grid.attach(self.anotherButton,0,3,1,1)
         self.anotherButton.set_hexpand(True)
 
-        self.closeButton = Gtk.Button(label="Exit")
-        self.grid.attach(self.closeButton,0,4,1,1)
-        self.closeButton.connect("clicked",self.close)
-        self.closeButton.set_hexpand(True)
+        # Who needs an exit button? Everybody's got window controls...
+        # self.closeButton = Gtk.Button(label="Exit")
+        # self.grid.attach(self.closeButton,0,4,1,1)
+        # self.closeButton.connect("clicked",self.close)
+        # self.closeButton.set_hexpand(True)
+        
+        self.grabImages()
+        self.img.set_from_file('/tmp/image.jpg')
 
-        firstSug = ranSuggest(library)
 
-
-    def close(self,widget):
-        Gtk.main_quit()
+    # def close(self,widget):
+    #     Gtk.main_quit()
 
     def newRec(self,widget):
-        tmpText = "<b>{}</b>".format(ranSuggest(self.library))
+        self.curRec = ranSuggest(self.library)
+        tmpText = "<b>{}</b>".format(self.curRec)
         self.recLabel.set_markup(tmpText)
+
+    def updateImage(self,widget):
+        self.grabImages()
+        self.img.set_from_file('/tmp/image.jpg')
+
+    def grabImages(self):
+        headers = {'user-agent':'silt/0.1 +https://github.com/charlesschimmel/silt','Authorization':'Discogs key=JwTFBZkshygrKQlbltem,secret=oAKieUZtUMLBQJDryTlxEMnQFzPhCyJx'}
+        releaseURL = self.library[self.curRec]
+        r = requests.get(releaseURL,headers=headers)
+        if r.status_code == 200:
+            r = r.json()
+            for sub in r['images']:
+                if sub['type'] == 'primary':
+                    r = requests.get(sub['resource_url'],headers=headers, stream=True)
+                    with open('/tmp/image.jpg','wb') as f:
+                        r.raw.decode_content = True
+                        shutil.copyfileobj(r.raw,f)
+        else:
+            pass
+
+"""
+TODO: make a "no connection available" window
+class noConWin(Gtk.Window):
+    def __init__(self,user,library)
+"""
+
+        
 
 
 
@@ -67,18 +104,19 @@ def discogsPull(user):
     """
     pulling from discogs whether or not the user exists
     """
-    user_agent = {'User-agent':'silt/0.1 +https://github.com/charlesschimmel/silt'}
+    headers = {'user-agent':'silt/0.1 +https://github.com/charlesschimmel/silt','Authorization':'Discogs key=JwTFBZkshygrKQlbltem,secret=oAKieUZtUMLBQJDryTlxEMnQFzPhCyJx'}
     discogsURL = 'https://api.discogs.com/users/{}/collection/folders/0/releases'.format(user)
-    r = requests.get(discogsURL, headers = user_agent)
+    r = requests.get(discogsURL, headers=headers)
     discogsDictAll = r.json()
+
     if 'message' in discogsDictAll:
+        return False
+    elif r.status_code != 200:
         return False
     else:
         library = {}
         for release in discogsDictAll['releases']:
-            for info in release:
-                if type(release[info])== dict:
-                    library[release[info]['title']] = release[info]['artists'][0]['name']
+            library[release['basic_information']['title']] = release['basic_information']['resource_url']
         return library
 
 def genSuggest(recAmt,library,libraryKeys):
@@ -90,7 +128,7 @@ def genSuggest(recAmt,library,libraryKeys):
     listenList = []
     for ct in range(recAmt):
         tempRec = libraryKeys[random.randrange(len(library))]
-        tempStr = tempRec+' by '+library[tempRec]
+        tempStr = tempRec
         if tempStr not in listenList:
             listenList.append(tempStr)
         else:
@@ -100,8 +138,7 @@ def genSuggest(recAmt,library,libraryKeys):
 def ranSuggest(library):
     random.seed()
     tempRec = list(library.keys())[random.randrange(len(library))]
-    tempStr = tempRec+' by '+library[tempRec]
-    return tempStr
+    return tempRec
         
 
 def popLibrary(user):
@@ -171,7 +208,7 @@ def main():
     interprates arguments and decides what to do depending on what arguments are provided
     too messy, I'd like to clean this up
     """
-    validArgs = ['-u','-r','-h','-update']
+    validArgs = ['-r','-h','-update']
     if len(argv) > 1:
         if '-r' in argv:
             if argv.index('-r') + 1 < len(argv):
@@ -195,26 +232,28 @@ def main():
             print('Updating...')
             library = popLibrary(user)
             libraryDump(library,libraryFile)
+            print('Done.')
 
-        if '-u' not in argv and '-r' not in argv and '-update' not in argv and '-gtk' not in argv: # some argument was given but not valid
+        if '-r' not in argv and '-update' not in argv and '-gtk' not in argv: # some argument was given but not valid
             help()
 
 
-    if library == None:
-        library = popLibrary(user)
-        libraryDump(library,libraryFile)
-        listenList = genSuggest(recAmt,library,list(library))
-        if '-gtk' in argv:
-            mainGtk(user,library)
-        else:
-            mainCli(listenList)
+    if '-update' not in argv and '-h' not in argv:
+        if library == None:
+            library = popLibrary(user)
+            libraryDump(library,libraryFile)
+            listenList = genSuggest(recAmt,library,list(library))
+            if '-gtk' in argv:
+                mainGtk(user,library)
+            else:
+                mainCli(listenList)
 
-    else:
-        listenList = genSuggest(recAmt,library,list(library))
-        if '-gtk' in argv:
-            mainGtk(user,library)
         else:
-            mainCli(listenList)
+            listenList = genSuggest(recAmt,library,list(library))
+            if '-gtk' in argv:
+                mainGtk(user,library)
+            else:
+                mainCli(listenList)
 
 def mainGtk(user,library):
     win = mainWin(user,library)

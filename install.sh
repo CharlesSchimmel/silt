@@ -11,24 +11,34 @@ else
     echo "This will install 'silt'"
     echo "[ENTER] to confirm"
     read confirm
-    # I'm just going to package Requests with it instead. Using pip3 to install something is rude
 
     #check if app location exists; only make it if it exists
     if ! [ -e $APP ]; then
         mkdir -m 777 $APP
     fi
 
-    echo "Getting/Unpacking requests..."
-    wget -O /tmp/requests.tar.gz https://pypi.python.org/packages/source/r/requests/requests-2.8.1.tar.gz
-    tar xvfz /tmp/requests.tar.gz -C $APP >/dev/null 2>&1
-    cp /tmp/requests-2.8.1/requests $APP
-    echo "Done."
+    echo "This will download dependencies 'requests' and 'pgi' from the python repository."
+    echo "If you wish to install these yourself with Pip or you belive they are installed,"
+    echo "enter 'n'"
+    read confirm
 
-    echo "Getting/Unpacking pgi..."
-    wget -o /tmp/pgi.tar.gz https://pypi.python.org/packages/source/p/pgi/pgi-0.0.10.1.tar.gz
-    tar xvfz /tmp/pgi.tar.gz -C $APP >/dev/null 2>&1
-    cp /tmp/pgi-0.0.10.1/pgi $APP
-    echo "Done."
+    if [ $confirm != "n" ]; then
+        echo "Getting/Unpacking requests..."
+        wget -O /tmp/requests.tar.gz https://pypi.python.org/packages/source/r/requests/requests-2.8.1.tar.gz 
+        tar xvfz /tmp/requests.tar.gz
+        cp -r /tmp/requests-2.8.1/requests $APP
+        echo "Done."
+
+        echo "Getting/Unpacking pgi..."
+        cd /tmp/
+        wget https://pypi.python.org/packages/source/p/pgi/pgi-0.0.10.1.tar.gz 
+        tar xvfz /tmp/pgi-0.0.10.1.tar.gz
+        cp -r /tmp/pgi-0.0.10.1/pgi $APP
+        echo "Done."
+    else 
+        echo "run 'pip3 install requests pgi to install missing packages"
+    fi 
+    
 
     #cp will overwrite
     cp -p silt.py $APP/silt.py
