@@ -1,0 +1,115 @@
+A{text-decoration:none}
+a:link	    { color: #888888 } 
+a:visited	{ color: #888888 } 
+a:hover	    { color: #444444 } 
+@import url(https://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700);
+@font-face {
+    font-family: 'Raleway', sans-serif;
+}
+
+.container{
+        
+    /* border: dotted; */
+    display: flex;
+    top: 35%;
+    width: 15%;
+}
+
+.menu {
+    /* border: dotted; */
+    font-weight:300;
+    font-family: 'Raleway';
+    font-size: 25px;
+    white-space: nowrap;
+    width: 100px;
+    color: #999999;
+}
+
+.righty {
+    /* border: dotted; */
+    position: absolute;
+    left: 15%;
+    flex-grow: 1;
+    width: 75%;
+}
+
+.hide { 
+    /* color: #999999; */
+    /* display: none; */
+    /* white-space: nowrap; */
+    /* flex-grow: 1; */
+}
+
+.show:hover .hide {
+    /* display: inline; */
+    /* padding-left: 10px; */
+    /* flex-grow: 1; */
+}
+.content {
+    /* border: solid; */
+    position: relative;
+    color: #555555;
+    font-weight:300;
+    font-family: 'Raleway';
+    font-size: 20px;
+    width: 100%;
+    margin:auto;
+}
+.content a:link	    { color: #888888; font-weight:600} 
+.content a:visited	{ color: #888888; font-weight:600} 
+.content a:hover	{ color: #444444; font-weight:600} 
+
+a#here:link { color: #444444 }
+a#here:visited { color: #444444 }
+
+.name {
+    /* border: dotted; */
+    width: 50%;
+    position: relative;
+    left: 14%;
+}
+
+.foot {
+    position: relative;
+    color: #555555;
+    font-weight:300;
+    font-family: 'Raleway';
+    font-size: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+
+h1 {
+    color: #666666;
+    font-weight:500;
+    font-family: 'Raleway';
+    font-size: 35px;
+}
+
+h2 {
+    margin: auto;
+    color: #444444;
+    font-weight:400;
+    font-family: 'Raleway';
+    font-size: 30px;
+}
+
+h3 {
+    color: #444444;
+    font-weight:400;
+    font-family: 'Raleway';
+    font-size: 20px;
+}
+
+p {
+    font-size: 16px;
+}
+
+img {
+    max-width:100%;
+    height: auto;
+    width: auto;
+}
+
+    

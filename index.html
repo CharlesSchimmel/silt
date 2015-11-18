@@ -1,1 +1,65 @@
-Hello!
+<!DOCTYPE html>
+<link rel="shortcut icon" href="favicon.ico">
+<title>silt</title>
+<html>
+<head>
+<link href='https://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<div class="name"><h1>Charles Schimmel {pfennig}</h1></div>
+<body bgcolor="eeeeee">
+<div class="container">
+    <div class="menu show">
+        
+        <a id="here" href="index.html">about me</a><br>
+        <a href="projects.html">all projects</a><br>
+        
+    </div>
+    <div class = "righty">
+        <div class= "content">
+            <h2>silt</h2>
+            <h3>What?</h3>
+            <p>A shuffle button for your vinyl!<br>
+            Pulls your record collection from discogs then randomly chooses one and displays its album art.</p>
+            <h3>Why?</h3>
+            <p>Why not? I couldn't decide what to listen to from my vinyl collection so I automated it.</p>
+            <h3>Usage</h3>
+            <p>
+            Install using the provided install.sh, then run with "silt" in the command line.<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"-r" to change number of recommendations<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"-update" to update local library<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"-gtk" for a sweet windowed experience! With cover art!<br>
+            </p>
+
+            <h3>What have I learned so far?</h3>
+            <p>
+            APIs and JSON make things very easy, especially when working cross-language.<br>
+            There's nothing wrong with using someone else's API and Auth interface and you will save yourself a headache doing so. <br>
+            Put the executable somewhere safe then symlink it to /usr/local/bin.<br>
+            Install to /usr/local/bin, not /usr/bin.<br>
+            Using PyGi to create GTK interfaces (but it's not commonly used, nor well documented, and is just a C wrapper.)<br>
+            I do not know how to correctly package/make/bundle python scripts<br>
+            (but asking first, downloading, unpacking, and moving the dependencies is an OK solution.)<br>
+            More Git experience.<br>
+            Furthered my understanding of why documentation is important.<br>
+            </p>
+
+            <h3>Screenshots</h3>
+            <img src="silt1.png">
+            <img src="silt2.png">
+            <h3>Bugs?</h3>
+            <p>You betcha.</p>
+            <p>When starting the GTK it will load the album art from the last time it was ran. Should be an easy fix.<br>
+            Need to make a seperate window when run without internet or Discogs access<br>
+
+
+            
+
+            <p></p>
+            <div class = "foot">
+                <!-- test example -->
+            </div>
+        </div>
+    </div>
+</div>
