@@ -3,7 +3,7 @@ A shuffle button for your records.
 
 <a href="charlesschimmel.github.io/silt">For more info, click here.</a>
 
-Silt is a python script to pull a random record from your Discogs collection. A shuffle button for your records.
+Silt is a python script to pull a random record from your Discogs collection.
 
 Dependencies: python3, requests and pgi already installed or wget to download them to app directory.
 
