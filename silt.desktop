@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=silt
+Comment=Discogs record recommendationso
+Exec=silt -gtk
+Terminal=false
+Categories=Audio

@@ -9,9 +9,13 @@ from gi.repository import Gtk
 
 class mainWin(Gtk.Window):
     def __init__(self,user,library):
+        """
+        The windowy bit.
+        Pulls library into a class variable, grabs an intitial recommendation, intializes the window
+        """
         self.library = library
         self.curRec = ranSuggest(self.library)
-        Gtk.Window.__init__(self,title="Silt")
+        Gtk.Window.__init__(self,title="silt")
 
         self.grid = Gtk.Grid()
         self.add(self.grid)
@@ -19,64 +23,56 @@ class mainWin(Gtk.Window):
 
         labelText = "How about:"
         self.label1 = Gtk.Label()
-        self.label1.set_markup("How about:")
         self.grid.attach(self.label1,0,0,1,1)
-        self.label1.set_hexpand(True)
+        self.label1.set_hexpand(True) # Centers
 
         self.recLabel = Gtk.Label()
         tmpText = "<b>{}</b>".format(ranSuggest(self.library))
         self.recLabel.set_markup(tmpText)
         self.grid.attach(self.recLabel,0,1,1,1)
-        self.recLabel.set_hexpand(True)
+        self.recLabel.set_hexpand(True) # Centers
 
-        self.cover = Gtk.Frame()
-        self.grid.attach(self.cover,0,2,1,1)
-        self.img = Gtk.Image.new_from_file('')
-        self.cover.add(self.img)
+        self.cover = Gtk.Frame() # Creates a frame to put the image into 
+        self.grid.attach(self.cover,0,2,1,1) # Adds it to the grid
+        self.img = Gtk.Image.new_from_file('') #Intializes the image without a file
+        self.cover.add(self.img) # Adds it to the frame
 
         self.anotherButton = Gtk.Button(label="Another")
-        self.anotherButton.connect("clicked",self.newRec)
-        self.anotherButton.connect("clicked",self.updateImage)
+        self.anotherButton.connect("clicked",self.newRec) # Pulls a new recommendation, could probalby go in grabImages
+        self.anotherButton.connect("clicked",self.grabImages) # Downloads and changes image
         self.grid.attach(self.anotherButton,0,3,1,1)
         self.anotherButton.set_hexpand(True)
 
-        # Who needs an exit button? Everybody's got window controls...
-        # self.closeButton = Gtk.Button(label="Exit")
-        # self.grid.attach(self.closeButton,0,4,1,1)
-        # self.closeButton.connect("clicked",self.close)
-        # self.closeButton.set_hexpand(True)
-        
-        self.grabImages()
-        self.img.set_from_file('/tmp/image.jpg')
+        self.grabImages(None)
 
-
-    # def close(self,widget):
-    #     Gtk.main_quit()
 
     def newRec(self,widget):
-        self.curRec = ranSuggest(self.library)
+        self.curRec = ranSuggest(self.library) # Calls ranSuggest with the local library
         tmpText = "<b>{}</b>".format(self.curRec)
         self.recLabel.set_markup(tmpText)
 
-    def updateImage(self,widget):
-        self.grabImages()
-        self.img.set_from_file('/tmp/image.jpg')
-
-    def grabImages(self):
+    def grabImages(self,widget):
+        """
+        Does the calling to the API. First defines headers, then calls, if the call is good pull the image
+        """
         headers = {'user-agent':'silt/0.1 +https://github.com/charlesschimmel/silt','Authorization':'Discogs key=JwTFBZkshygrKQlbltem,secret=oAKieUZtUMLBQJDryTlxEMnQFzPhCyJx'}
         releaseURL = self.library[self.curRec]
         r = requests.get(releaseURL,headers=headers)
         if r.status_code == 200:
             r = r.json()
-            if 'images' in sub:
-                for sub in r['images']:
-                    if sub['type'] == 'primary':
-                        r = requests.get(sub['resource_url'],headers=headers, stream=True)
+            if 'images' in r: # Check if an image is available
+                for releaseDict in r['images']:
+                    if releaseDict['type'] == 'primary': # Only pull primary image
+                        r = requests.get(releaseDict['resource_url'],headers=headers, stream=True) # Fancy downloading. Stream allows it to break into chunks and be stored with shutil when requests sees it as a raw file.
                         with open('/tmp/image.jpg','wb') as f:
                             r.raw.decode_content = True
                             shutil.copyfileobj(r.raw,f)
-            else:
-                print('No image available for this release.')
+                        self.img.set_from_file('/tmp/image.jpg') # Change it
+                        self.label1.set_markup("How about:") # Update in case last one wasn't available
+
+            else: # Otherwise replace the image with nothing, display a message
+                self.label1.set_markup("No image available for this release.")
+                self.img.set_from_file('')
         else:
             pass
 
@@ -84,10 +80,9 @@ class mainWin(Gtk.Window):
 TODO: make a "no connection available" window
 class noConWin(Gtk.Window):
     def __init__(self,user,library)
+
+Make a heavy lifting class
 """
-
-        
-
 
 
 def help():
@@ -269,6 +264,5 @@ def mainCli(listenList):
         print(rec)
 try:
     main()
-
 except KeyboardInterrupt:
     pass
