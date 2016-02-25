@@ -26,13 +26,13 @@ else
     if [[ $confirm != "n" ]]; then
         echo "Getting/Unpacking requests..."
         wget -O /tmp/requests.tar.gz https://pypi.python.org/packages/source/r/requests/requests-2.8.1.tar.gz >/dev/null 2>&1
-        tar xvfz /tmp/requests.tar.gz >/dev/null 2>&1
+        tar xfz /tmp/requests.tar.gz >/dev/null 2>&1
         cp -r /tmp/requests-2.8.1/requests $APP >/dev/null 2>&1
         echo "Done."
 
         echo "Getting/Unpacking pgi..."
         wget -O /tmp/pgi.tar.gz https://pypi.python.org/packages/source/p/pgi/pgi-0.0.10.1.tar.gz >/dev/null 2>&1
-        tar xvfz /tmp/pgi-0.0.10.1.tar.gz >/dev/null 2>&1
+        tar xfz /tmp/pgi-0.0.10.1.tar.gz >/dev/null 2>&1
         cp -r /tmp/pgi-0.0.10.1/pgi $APP >/dev/null 2>&1
         echo "Done."
     else 
