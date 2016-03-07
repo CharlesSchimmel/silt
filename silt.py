@@ -96,6 +96,7 @@ def help():
     print("silt [-r #] [-update]")
     print("-r: number of recommendations. Default = 1")
     print("-update: update local library")
+    print("-gtk: graphical interface")
 
 def discogsPull(user):
     """
